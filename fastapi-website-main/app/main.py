@@ -9,10 +9,12 @@ app = FastAPI()
 
 DB_FILE = "database.json"
 
+
 def save_data():
     with open(DB_FILE, "w") as f:
         json.dump(db, f, indent=4)
     print("Data saved to JSON")
+
 
 def load_data():
     global db
@@ -22,9 +24,10 @@ def load_data():
                 db = json.load(f)
                 print("Data loaded successfully")
             except json.JSONDecodeError:
-                db =[]
+                db = []
     else:
         db = []
+
 
 load_data()
 
@@ -32,8 +35,16 @@ biography = "Hi, I am Chee Yang and I like doing sports such as swimming, playin
 socials = "<a href ='https://www.instagram.com/furios_guy/'>My Instagram</a>"
 
 db = [
-    {"name": "Chee Yang", "hobby": "talking with friends", "age": "12", "color": "black", "biography": biography, "socials": socials},
+    {
+        "name": "Chee Yang",
+        "hobby": "talking with friends",
+        "age": "12",
+        "color": "black",
+        "biography": biography,
+        "socials": socials,
+    },
 ]
+
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
@@ -105,14 +116,17 @@ async def home():
     """
     return html_content
 
+
 @app.get("/students")
 async def get_students():
     return db
+
 
 @app.post("/add-student")
 async def add_student(student: Student):
     db.append(student.model_dump())
     return {"message": f"Added {student.name}'s profile!"}
+
 
 @app.delete("/delete-student/{name}")
 async def delete_student(name: str):
@@ -120,18 +134,19 @@ async def delete_student(name: str):
 
     student_found = False
 
-    for i in range(len(db) - 1, - 1, - 1):
+    for i in range(len(db) - 1, -1, -1):
         if db[i]["name"] == name:
             del db[i]
             student_found = True
             break
 
         if student_found:
-            return{"message": f"Deleted {name}'s profile successfully!"}
+            return {"message": f"Deleted {name}'s profile successfully!"}
         else:
-            return{"message": f"Student {name} not found!"}
+            return {"message": f"Student {name} not found!"}
+
 
 @app.post("/save-everything")
 async def save_everything():
     save_data()
-    return {"message" : "All data has been saved to disk!"}
+    return {"message": "All data has been saved to disk!"}
